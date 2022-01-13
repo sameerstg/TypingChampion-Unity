@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     public string[] leftHand;
     public int score, missed;
     public float time;
-    bool firstTime = false;
+    bool firstTime;
     bool started = false;
     int entry;
     float TotalTime;
@@ -31,10 +31,14 @@ public class GameManager : MonoBehaviour
     public float timeLimit;
     public InputField inputForPractice;
     public bool isPracticing;
-
+    
+    List<string> practicingWordsList = new List<string>();
     private void Start()
     {
 
+        firstTime = false;
+
+        score = 0;
         isPracticing = false;
         isRightHand = false;
         islefttHand = false;
@@ -1147,7 +1151,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-
+        
         if (startAnim)
         {
             StartCoroutine(Delay1());
@@ -1159,15 +1163,17 @@ public class GameManager : MonoBehaviour
         }
         if (firstTime)
         {
+            started = true;
             time += Time.deltaTime;
+            
+            
+        }
+        if (started)
+        {
             TotalTime += Time.deltaTime;
             TotalTimeText.text = "Total Time : " + TotalTime.ToString().Substring(0, 3);
-
-                    wpm = (entry / 5) / (TotalTime / 60);
-        WpmText.text = "WPM : " + wpm;
-
-
-
+            wpm = (entry * 60) / TotalTime;
+            WpmText.text = "WPM : " + wpm;
         }
         if (time > timeLimit)
         {
@@ -1294,11 +1300,31 @@ public class GameManager : MonoBehaviour
         }
         else if (islefttHand && !isRightHand && !isPracticing)
         {
-            var a = leftHand[Random.Range(0, rightHand.Length)];
-            var b = leftHand[Random.Range(0, rightHand.Length)];
-            var c = leftHand[Random.Range(0, rightHand.Length)];
-            var d = leftHand[Random.Range(0, rightHand.Length)];
-            popupText.text = (a + b + c + d);
+            var a = leftHand[Random.Range(0, leftHand.Length)];
+            var b = leftHand[Random.Range(0, leftHand.Length)];
+            var c = leftHand[Random.Range(0, leftHand.Length)];
+            var d = leftHand[Random.Range(0, leftHand.Length)];
+            if (score < 15)
+            {
+                popupText.text = (a);
+            }
+            else if (score < 30)
+            {
+                popupText.text = (a + b);
+            }
+            else if (score < 45)
+            {
+                popupText.text = (a + b + c);
+            }
+            else if (score < 60)
+            {
+                popupText.text = (a + b + c + d);
+            }
+            else
+            {
+                popupText.text = (a + b + c + d);
+            }
+            
 
 
 
@@ -1308,9 +1334,11 @@ public class GameManager : MonoBehaviour
             firstTime = true;
 
         }
-        else if (isPracticing)
+        else if (isPracticing && !islefttHand && !isRightHand)
         {
-            practicingWords = popupText.text;
+            
+
+            
             startAnim = true;
             inputField.ActivateInputField();
             Animation();
@@ -1318,13 +1346,15 @@ public class GameManager : MonoBehaviour
 
 
         }
-
+        
 
 
     }
     public void PracticingWordsSetting()
     {
         practicingWords = inputForPractice.text;
+        
+        
     }
     public void Animation()
     {
